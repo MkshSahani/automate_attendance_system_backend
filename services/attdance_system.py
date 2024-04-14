@@ -1,6 +1,7 @@
 import face_recognition
 import cv2
 import os 
+from startup import db
 import numpy as np
 
 def find_faces(college_name : str, course_name: str, target_img : str):
@@ -25,3 +26,28 @@ def find_faces(college_name : str, course_name: str, target_img : str):
         if name != "Unknown" and name not in face_names:
             face_names.append(name)
     return face_names
+
+
+def get_user_details(user_name : str):
+    user_details = list(db.users.find({
+        "username": user_name
+    }))
+    res_lst = []
+    for user in user_details:
+        del user['_id']
+        res_lst.append(user)
+    return res_lst
+
+def get_courses_details(user_name: str):
+    course_details = list(db.courses.find({
+        "username": user_name
+    }))
+    res_lst = []
+    for course in course_details:
+        del course['_id']
+        res_lst.append(course)
+    return res_lst
+
+def query_course_details(query_dict: dict):
+    course_details = list(db.courses.find(query_dict))
+    return course_details
