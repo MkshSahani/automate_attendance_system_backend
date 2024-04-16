@@ -51,3 +51,9 @@ def get_courses_details(user_name: str):
 def query_course_details(query_dict: dict):
     course_details = list(db.courses.find(query_dict))
     return course_details
+
+
+def query_student_details(query_dict : dict):
+    student_details = list(db.students.find(query_dict))
+    return student_details
+

@@ -30,6 +30,7 @@ def register_new_user():
     db.users.insert_one(userDetails)
     user_details = get_user_details(userDetails['username'])[0]
     course_details = get_courses_details(userDetails['username'])
+    os.mkdir(f"./images/{userDetails['username']}")
     return {
         "status_code": 200,
         "message": "Account Created",
@@ -110,12 +111,72 @@ def register_new_course():
             }
         }
     db.courses.insert_one(course_data)
+    os.mkdir(f"./images/{course_data['username']}/{course_data['course_code']}")
     return {
         'status_code': 200,
         'message': 'Successfull',
         'data': {
 
         }
+    }
+
+@app.route("/register_student", methods = ['POST'])
+def regiter_new_student():
+    print(request.files)
+    print(request.form)
+    course_code = request.form['course_code']
+    roll_number = request.form['roll_number']
+    full_name = request.form['full_name']
+    username = request.form['username']
+
+    student_list = query_student_details({
+        'course_code': course_code,
+        'roll_number': roll_number,
+        'username': username
+    })
+
+    if len(student_list) > 0:
+        return {
+            "status_code": 400,
+            "message": "Roll Number Alredy Registered.",
+            "data": {}
+        }
+
+    print(f"course code : {course_code} full name : {full_name} roll number : {roll_number} username : {username}")
+    db.students.insert_one({
+        'course_code': course_code,
+        'roll_number': roll_number,
+        'full_name': full_name,
+        'username': username
+    })
+    try:
+        file = request.files['picture']
+        file.save(f"./images/{username}/{course_code}/{roll_number}.jpeg")
+        return {
+            "status_code": 200,
+            "message": 'Successfull',
+            'data': {
+
+            }
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "status_code": 400,
+            "message": "Sucessfull",
+            'data': {
+                
+            }
+        }
+    
+@app.route("/register_attendance", methods = ['POST'])
+def register_attendance_request():
+    print(request.files)
+    print(request.form)
+    return {
+        "status_code": 200,
+        "data": {},
+        "message": "Succesfull"
     }
 
 app.run(host = "0.0.0.0")
