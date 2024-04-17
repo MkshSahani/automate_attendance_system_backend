@@ -173,6 +173,17 @@ def regiter_new_student():
 def register_attendance_request():
     print(request.files)
     print(request.form)
+    number_of_image = int(request.form['number_of_picture'])
+    username = request.form['username']
+    course_code = request.form['course_code']
+    present_student_list = []
+    for i in range(number_of_image):
+        key_name = "picture" + str(i)
+        request.files[key_name].save(f"{username}_{course_code}.jpg")
+        student_list = find_faces(username=username, course_code=course_code, target_img = f"{username}_{course_code}.jpg")
+        print(student_list)
+        present_student_list.extend(student_list)
+    print(present_student_list)
     return {
         "status_code": 200,
         "data": {},

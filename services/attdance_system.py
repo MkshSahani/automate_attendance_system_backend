@@ -4,8 +4,8 @@ import os
 from startup import db
 import numpy as np
 
-def find_faces(college_name : str, course_name: str, target_img : str):
-    image_list_path = './images/iitism/bss/'
+def find_faces(username : str, course_code: str, target_img : str):
+    image_list_path = f'./images/{username}/{course_code}/'
     image_file_name_list = [(os.path.join(image_list_path, fname), fname) for fname in os.listdir(image_list_path)]
     known_face_encodings = []
     known_face_names = []
