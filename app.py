@@ -40,6 +40,32 @@ def register_new_user():
         }
     }
 
+@app.route("/get_attendance", methods = ['POST'])
+def get_attendance_details():
+    query_dict = request.json
+    course_code = query_dict['course_code']
+    username = query_dict['username']
+    print(query_dict)
+    attendance_details = query_attendance_details({
+        "$and": [
+            {
+                "course_code": course_code
+            },
+            {
+                "username": username
+            }
+        ]
+    })
+    print(attendance_details)
+    return {
+        "status_code": 200,
+        "message": "Successfull",
+        "data": {
+            "attendance_data": attendance_details
+        }
+    }
+
+
 @app.route('/login', methods = ['POST'])
 def user_login():
     body = request.data
@@ -176,6 +202,7 @@ def register_attendance_request():
     number_of_image = int(request.form['number_of_picture'])
     username = request.form['username']
     course_code = request.form['course_code']
+    date = request.form['date']
     present_student_list = []
     for i in range(number_of_image):
         key_name = "picture" + str(i)
@@ -184,10 +211,26 @@ def register_attendance_request():
         print(student_list)
         present_student_list.extend(student_list)
     print(present_student_list)
+    final_list = []
+    for r in present_student_list:
+        if r not in final_list:
+            final_list.append(r)
+    print("--------------------")
+    db.attendance.insert_one(
+        {
+            "course_code": course_code,
+            "date": date,
+            "present_list": final_list,
+            "username": username
+        }
+    )
+    print("-------------------------")
     return {
         "status_code": 200,
         "data": {},
         "message": "Succesfull"
     }
+
+
 
 app.run(host = "0.0.0.0")
