@@ -215,7 +215,6 @@ def register_attendance_request():
     for r in present_student_list:
         if r not in final_list:
             final_list.append(r)
-    print("--------------------")
     db.attendance.insert_one(
         {
             "course_code": course_code,
@@ -224,7 +223,6 @@ def register_attendance_request():
             "username": username
         }
     )
-    print("-------------------------")
     return {
         "status_code": 200,
         "data": {},
@@ -232,5 +230,79 @@ def register_attendance_request():
     }
 
 
+@app.route("/get_student_list", methods = ['POST'])
+def get_course_student_list():
+    username = request.json['username']
+    course_code = request.json['course_code']
+    student_list = get_course_students(username = username, course_code = course_code)
+    print(student_list)
+    return {
+        "status_code": 200,
+        "data": {
+            "student_list": student_list
+        },
+        "message": "Successfull"
+    }
+
+@app.route("/update_attendance", methods = ['POST'])
+def update_student_attendance():
+    username = request.json['username']
+    course_code = request.json['course_code']
+    target_date = request.json['date']
+    present_student_list = request.json['present_list']
+    print(username)
+    print(course_code)
+    print(target_date)
+    print(present_student_list)
+    db.attendance.update_one(
+        {
+            "course_code": course_code,
+            "date": target_date,
+            "username": username
+        },
+        {  
+            "$set": 
+            {
+                "present_list": present_student_list,
+            }
+        }
+    )
+    return {
+        "status_code": 200,
+        "message": "Successfull",
+        "data": {
+
+        }
+    }
+
+
+@app.route("/get_attendance_date", methods = ['POST'])
+def get_attendance_details_date():
+    query_dict = request.json
+    course_code = query_dict['course_code']
+    username = query_dict['username']
+    date = query_dict['date']
+    print(query_dict)
+    attendance_details = query_attendance_details({
+        "$and": [
+            {
+                "course_code": course_code
+            },
+            {
+                "username": username
+            },
+            {
+                "date": date
+            }
+        ]
+    })
+    print(attendance_details)
+    return {
+        "status_code": 200,
+        "message": "Successfull",
+        "data": {
+            "attendance_data": attendance_details
+        }
+    }
 
 app.run(host = "0.0.0.0")

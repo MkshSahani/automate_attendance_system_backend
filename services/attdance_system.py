@@ -57,12 +57,27 @@ def query_student_details(query_dict : dict):
     student_details = list(db.students.find(query_dict))
     return student_details
 
-def query_attendance_details(query_dict):
-    # query_dict["_id"] = 0
-    print(query_dict)
+def query_attendance_details(query_dict : dict):
     present_student_list = list(
         db.attendance.find(query_dict)
     )
     for i in range(len(present_student_list)):
         del present_student_list[i]["_id"]
     return present_student_list
+
+
+def get_course_students(username : str, course_code : str):
+    student_list = list(
+        db.students.find(
+            {
+                "username": username,
+                "course_code": course_code
+            },
+            {
+                "_id": 0,
+                "full_name": 1,
+                "roll_number": 1
+            }
+        )
+    )
+    return student_list
